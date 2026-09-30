@@ -4,14 +4,28 @@ import { useTenant } from "@/providers/TenantProvider";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
 import { useWorkspace } from "@/providers/WorkspaceProvider";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export function TopNav() {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { activeCompany } = useTenant();
   const { colors, isDark, mode, toggleTheme } = useEnterpriseTheme();
   const { setCommandPaletteOpen } = useWorkspace();
+  const router = useRouter();
+
+  const handleSignOut = () => {
+    signOut();
+    router.replace("/(auth)/login");
+  };
+
+  // `user` should never actually be null here — (workspace)/_layout.tsx
+  // redirects to /login before WorkspaceShell (and this component) ever
+  // mounts — but this stays null-safe defensively rather than assuming
+  // that invariant holds forever.
+  const displayName = user?.name ?? "Signed out";
+  const displayRole = user ? roleLabels[user.role] : "";
 
   return (
     <View style={[styles.topNav, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
@@ -43,13 +57,20 @@ export function TopNav() {
         <Ionicons name="notifications-outline" size={18} color={colors.text} />
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={[styles.iconButton, { borderColor: colors.borderStrong, backgroundColor: isDark ? colors.card : "transparent" }]}
+        onPress={handleSignOut}
+      >
+        <Ionicons name="log-out-outline" size={18} color={colors.text} />
+      </TouchableOpacity>
+
       <View style={styles.profile}>
         <View style={[styles.avatar, { backgroundColor: activeCompany.brandColor }]}>
-          <Text style={styles.avatarText}>{user.name.slice(0, 1)}</Text>
+          <Text style={styles.avatarText}>{displayName.slice(0, 1).toUpperCase()}</Text>
         </View>
         <View>
-          <Text style={[styles.userName, { color: colors.text }]}>{user.name}</Text>
-          <Text style={[styles.userRole, { color: colors.textMuted }]}>{roleLabels[user.role]}</Text>
+          <Text style={[styles.userName, { color: colors.text }]}>{displayName}</Text>
+          <Text style={[styles.userRole, { color: colors.textMuted }]}>{displayRole}</Text>
         </View>
       </View>
     </View>

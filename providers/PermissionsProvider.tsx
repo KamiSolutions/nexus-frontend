@@ -12,12 +12,15 @@ const PermissionsContext = createContext<PermissionsContextValue | null>(null);
 export function PermissionsProvider({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
+  // `user` is null until a real sign-in completes (see AuthProvider) — no
+  // permissions are granted before that, rather than falling back to some
+  // default role.
   const value = useMemo(
     () => ({
-      permissions: rolePermissions[user.role],
-      canAccess: (permission: Permission) => can(user.role, permission),
+      permissions: user ? rolePermissions[user.role] : [],
+      canAccess: (permission: Permission) => (user ? can(user.role, permission) : false),
     }),
-    [user.role],
+    [user],
   );
 
   return <PermissionsContext.Provider value={value}>{children}</PermissionsContext.Provider>;
@@ -32,4 +35,3 @@ export function usePermissions() {
 
   return context;
 }
-

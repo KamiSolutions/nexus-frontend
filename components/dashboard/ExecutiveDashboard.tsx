@@ -1,9 +1,10 @@
 import { KpiCard } from "@/components/cards/KpiCard";
 import { MiniBarChart } from "@/components/charts/MiniBarChart";
+import { CommandCentreStatus } from "@/components/dashboard/CommandCentreStatus";
 import { DataTable } from "@/components/tables/DataTable";
 import { Surface } from "@/components/ui/Surface";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { activityFeed, approvalPipeline, executiveKpis, revenueTrend } from "@/lib/analytics";
+import { approvalPipeline, executiveKpis, revenueTrend } from "@/lib/analytics";
 import { useTenant } from "@/providers/TenantProvider";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
 import React from "react";
@@ -69,12 +70,6 @@ export function ExecutiveDashboard() {
               </View>
             ))}
           </View>
-          <View style={[styles.aiPanel, { backgroundColor: isDark ? colors.hover : colors.background, borderColor: colors.borderStrong }]}>
-            <Text style={[styles.aiTitle, { color: colors.text }]}>AI operating insight</Text>
-            <Text style={[styles.aiText, { color: colors.textMuted }]}>
-              Finance approvals are clustering around capex. Consider a delegated approval lane for sub-R250k requests.
-            </Text>
-          </View>
         </Surface>
       </View>
 
@@ -92,24 +87,12 @@ export function ExecutiveDashboard() {
           />
         </View>
 
-        <Surface style={styles.activityPanel}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>Activity feed</Text>
-          {activityFeed.map((item) => (
-            <View key={item} style={[styles.activityItem, { borderBottomColor: colors.border }]}>
-              <View
-                style={[
-                  styles.activityPulse,
-                  {
-                    backgroundColor: colors.blue,
-                    shadowColor: colors.blue,
-                    shadowOpacity: isDark ? 0.7 : 0,
-                  },
-                ]}
-              />
-              <Text style={[styles.activityText, { color: colors.text }]}>{item}</Text>
-            </View>
-          ))}
-        </Surface>
+        <View style={styles.commandCentreWrap}>
+          {/* Real cross-service health data from nexus-platform-service —
+              replaces the old hardcoded "Activity feed" and fabricated
+              "AI operating insight" panels that used to live here. */}
+          <CommandCentreStatus />
+        </View>
       </View>
     </ScrollView>
   );
@@ -222,47 +205,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "900",
   },
-  aiPanel: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 14,
-    gap: 6,
-  },
-  aiTitle: {
-    fontSize: 14,
-    fontWeight: "900",
-  },
-  aiText: {
-    fontSize: 13,
-    lineHeight: 19,
-    fontWeight: "600",
-  },
   tableWrap: {
     flex: 2,
     minWidth: 320,
   },
-  activityPanel: {
+  commandCentreWrap: {
     flex: 1,
     minWidth: 280,
-  },
-  activityItem: {
-    flexDirection: "row",
-    gap: 10,
-    paddingVertical: 13,
-    borderBottomWidth: 1,
-  },
-  activityPulse: {
-    width: 8,
-    height: 8,
-    borderRadius: 99,
-    marginTop: 6,
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 9,
-  },
-  activityText: {
-    flex: 1,
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "700",
   },
 });

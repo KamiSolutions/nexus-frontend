@@ -23,10 +23,11 @@ export const approvalPipeline = [
   { label: "Leases", count: 4, color: enterprisePalette.violet },
 ];
 
-export const activityFeed = [
-  "Kusile Financial Services approved 8 requisitions",
-  "Fleet Management uploaded 3 maintenance records",
-  "Group Admin invited 5 subsidiary auditors",
-  "Claims queue SLA improved by 18% this week",
-];
-
+// Note: a hardcoded `activityFeed` array used to live here, presented in
+// ExecutiveDashboard as a live "Activity feed" — one of the project's two
+// documented "fake integration" violations. It's been removed rather than
+// left unused: ExecutiveDashboard now renders real data from
+// nexus-platform-service's Overview endpoint instead (see
+// components/dashboard/CommandCentreStatus.tsx). The KPI/revenue/pipeline
+// figures above are still illustrative placeholders (no financials-service
+// aggregation endpoint feeds them yet) — P1 to wire up for real.
