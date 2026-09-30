@@ -41,9 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsAuthenticating(true);
     setAuthError(null);
     try {
-      // Real round-trip to nexus-identity-service's POST /auth/token — see
-      // services/auth/authService.ts for why `role` is what's provided
-      // rather than a password (no password store exists yet, P1).
+      // Real round-trip to nexus-identity-service's POST /auth/token — a
+      // real password check now (see services/auth/authService.ts and
+      // the identity service's app/store/user_store.py), not the earlier
+      // role-selection stand-in.
       const result = await loginRequest(input);
       setToken(result.accessToken);
       setRole(result.role);
