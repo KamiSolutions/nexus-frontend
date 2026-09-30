@@ -2,7 +2,7 @@ import { APP_NAME } from "@/lib/constants";
 import { roleLabels, type EnterpriseRole } from "@/lib/permissions";
 import { useAuth } from "@/providers/AuthProvider";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -46,8 +46,13 @@ export default function LoginScreen() {
   const router = useRouter();
   const { colors } = useEnterpriseTheme();
   const { signIn, isAuthenticating, authError } = useAuth();
-  const [userId, setUserId] = useState(demoUserId("GROUP_ADMIN"));
-  const [password, setPassword] = useState(DEMO_PASSWORD);
+  // `initialUserId` arrives from the register/forgot-password screens
+  // after they've done something real (created an account, reset a
+  // password) — prefilling it just saves retyping the same user_id, it
+  // doesn't imply anything about whether sign-in will succeed.
+  const params = useLocalSearchParams<{ initialUserId?: string }>();
+  const [userId, setUserId] = useState(params.initialUserId || demoUserId("GROUP_ADMIN"));
+  const [password, setPassword] = useState(params.initialUserId ? "" : DEMO_PASSWORD);
 
   const handleSignIn = async () => {
     if (!userId.trim() || !password) {
@@ -149,6 +154,15 @@ export default function LoginScreen() {
           >
             <Text style={styles.buttonText}>{isAuthenticating ? "Signing in..." : "Enter workspace"}</Text>
           </TouchableOpacity>
+
+          <View style={styles.footerLinks}>
+            <TouchableOpacity onPress={() => router.push("/(auth)/register")}>
+              <Text style={[styles.linkText, { color: colors.blue }]}>Create an account</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push("/(auth)/forgot-password")}>
+              <Text style={[styles.linkText, { color: colors.blue }]}>Forgot password?</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -252,5 +266,14 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 15,
     fontWeight: "900",
+  },
+  footerLinks: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  linkText: {
+    fontSize: 13,
+    fontWeight: "800",
   },
 });
