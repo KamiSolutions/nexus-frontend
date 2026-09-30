@@ -14,13 +14,10 @@
  */
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { Surface } from "@/components/ui/Surface";
+import { LABEL_BY_STATUS, TONE_BY_STATUS } from "@/lib/serviceStatus";
 import { useAuth } from "@/providers/AuthProvider";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
-import {
-  getOverviewStatus,
-  type OverviewStatus,
-  type ServiceStatusLevel,
-} from "@/services/platform/overviewService";
+import { getOverviewStatus, type OverviewStatus } from "@/services/platform/overviewService";
 import React, { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
@@ -28,18 +25,6 @@ type LoadState =
   | { kind: "loading" }
   | { kind: "error"; message: string }
   | { kind: "loaded"; data: OverviewStatus };
-
-const TONE_BY_STATUS: Record<ServiceStatusLevel, "emerald" | "rose" | "slate"> = {
-  operational: "emerald",
-  attention_required: "rose",
-  unknown: "slate",
-};
-
-const LABEL_BY_STATUS: Record<ServiceStatusLevel, string> = {
-  operational: "Operational",
-  attention_required: "Attention required",
-  unknown: "Unknown",
-};
 
 export function CommandCentreStatus() {
   const { colors } = useEnterpriseTheme();
