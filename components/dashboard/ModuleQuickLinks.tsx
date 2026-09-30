@@ -25,15 +25,31 @@ export function ModuleQuickLinks({ links }: { links: QuickLink[] }) {
     <View style={styles.row}>
       {links.map((link) => (
         <Link key={link.href} href={link.href as any} asChild>
+          {/*
+           * `asChild` makes expo-router hand this element's props to
+           * @radix-ui/react-slot on web, which merges ITS OWN style prop
+           * into ours via `{...ourStyle, ...itsStyle}`. That merge assumes
+           * a plain object — RN's `style={[a, b]}` array convention breaks
+           * it, because spreading an array pollutes the merged object with
+           * numeric keys ("0", "1", ...). React DOM then tries to assign
+           * those as CSS properties on the real <a> node and Chrome throws
+           * "Failed to set an indexed property [0] on 'CSSStyleDeclaration'".
+           * StyleSheet.flatten() collapses the array to one plain object
+           * first, which is the correct way to hand a style to a component
+           * that isn't RN's own style-array-aware View/Text — exactly this
+           * situation. Only reachable when the child is slotted like this;
+           * every other component in this file tree passes real RN
+           * View/Text style arrays and is unaffected.
+           */}
           <Text
-            style={[
+            style={StyleSheet.flatten([
               styles.chip,
               {
                 borderColor: colors.borderStrong,
                 backgroundColor: isDark ? colors.hover : colors.background,
                 color: colors.blue,
               },
-            ]}
+            ])}
           >
             {link.label}
           </Text>
