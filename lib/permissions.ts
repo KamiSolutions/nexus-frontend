@@ -1,3 +1,13 @@
+// Combined role model (2026-09-30): this is the single source of truth for
+// roles and permissions across both the frontend (this file, consumed by
+// PermissionsProvider/EnterpriseSidebar) and the backend (mirrored in
+// nexus-identity-service's app/core/rbac.py). Do not fork these — if a role
+// or module changes, update both files in the same change.
+//
+// DRIVER and MORTUARY_STAFF were added because every prior role was
+// back-office (finance/HR/fleet/claims/admin) with zero representation of
+// the field-operations side (vehicle dispatch, case intake, mortuary
+// logistics) that the platform is actually built around.
 export type EnterpriseRole =
   | "SUPER_ADMIN"
   | "GROUP_ADMIN"
@@ -6,6 +16,8 @@ export type EnterpriseRole =
   | "HR_MANAGER"
   | "FLEET_MANAGER"
   | "CLAIMS_OFFICER"
+  | "MORTUARY_STAFF"
+  | "DRIVER"
   | "TEAM_LEAD"
   | "EMPLOYEE"
   | "AUDITOR";
@@ -19,6 +31,7 @@ export type PermissionModule =
   | "finance"
   | "hr"
   | "vehicles"
+  | "cases"
   | "leases"
   | "policies"
   | "claims"
@@ -38,6 +51,8 @@ export const roleLabels: Record<EnterpriseRole, string> = {
   HR_MANAGER: "HR Manager",
   FLEET_MANAGER: "Fleet Manager",
   CLAIMS_OFFICER: "Claims Officer",
+  MORTUARY_STAFF: "Mortuary Staff",
+  DRIVER: "Driver",
   TEAM_LEAD: "Team Lead",
   EMPLOYEE: "Employee",
   AUDITOR: "Read-only Auditor",
@@ -50,6 +65,7 @@ const allModules: PermissionModule[] = [
   "finance",
   "hr",
   "vehicles",
+  "cases",
   "leases",
   "policies",
   "claims",
@@ -114,6 +130,14 @@ export const rolePermissions: Record<EnterpriseRole, Permission[]> = {
     "reports:view",
   ],
   CLAIMS_OFFICER: ["dashboard:view", "policies:view", "claims:view", "claims:create", "claims:approve"],
+  MORTUARY_STAFF: [
+    "dashboard:view",
+    "cases:view",
+    "cases:create",
+    "cases:manage",
+    "vehicles:view",
+  ],
+  DRIVER: ["dashboard:view", "vehicles:view"],
   TEAM_LEAD: ["dashboard:view", "employees:view", "hr:view", "finance:view", "finance:create"],
   EMPLOYEE: ["dashboard:view", "hr:view", "hr:create", "claims:view", "claims:create"],
   AUDITOR: allModules.map((module) => `${module}:view` as Permission),
@@ -122,4 +146,3 @@ export const rolePermissions: Record<EnterpriseRole, Permission[]> = {
 export function can(role: EnterpriseRole, permission: Permission) {
   return rolePermissions[role].includes(permission);
 }
-
