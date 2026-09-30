@@ -15,10 +15,15 @@ import {
   View,
 } from "react-native";
 
-// Every role the combined RBAC model defines — kept in the same order as
-// lib/permissions.ts so this list can never silently drift from what the
-// backend actually mints scopes for.
-const SELECTABLE_ROLES: EnterpriseRole[] = [
+// Must match nexus-identity-service's app/store/user_store.py exactly —
+// that's where these demo accounts are actually seeded (one per
+// EnterpriseRole, sharing this same password). Quick-fill chips below set
+// both fields from this list so every role can still be exercised without
+// a real signup/onboarding flow yet (P1) — but the request that goes out
+// is a genuine user_id + password login, not a role selector.
+const DEMO_PASSWORD = "NexusDemo!2026";
+
+const DEMO_ROLES: EnterpriseRole[] = [
   "SUPER_ADMIN",
   "GROUP_ADMIN",
   "COMPANY_ADMIN",
@@ -33,21 +38,24 @@ const SELECTABLE_ROLES: EnterpriseRole[] = [
   "AUDITOR",
 ];
 
+function demoUserId(role: EnterpriseRole): string {
+  return `demo.${role.toLowerCase()}@nexus.demo`;
+}
+
 export default function LoginScreen() {
   const router = useRouter();
   const { colors } = useEnterpriseTheme();
   const { signIn, isAuthenticating, authError } = useAuth();
-  const [userId, setUserId] = useState("amara@nexus.example");
-  const [role, setRole] = useState<EnterpriseRole>("GROUP_ADMIN");
-  const [tenantId, setTenantId] = useState("");
+  const [userId, setUserId] = useState(demoUserId("GROUP_ADMIN"));
+  const [password, setPassword] = useState(DEMO_PASSWORD);
 
   const handleSignIn = async () => {
-    if (!userId.trim()) {
+    if (!userId.trim() || !password) {
       return;
     }
 
     try {
-      await signIn({ userId: userId.trim(), role, tenantId: tenantId.trim() || undefined });
+      await signIn({ userId: userId.trim(), password });
       router.replace("/(workspace)/dashboard");
     } catch {
       // authError is already set by AuthProvider and rendered below —
@@ -70,42 +78,47 @@ export default function LoginScreen() {
 
           <View style={[styles.notice, { borderColor: colors.borderStrong, backgroundColor: colors.background }]}>
             <Text style={[styles.noticeText, { color: colors.textMuted }]}>
-              Demo login: nexus-identity-service has no password store yet, so signing in mints a real,
-              correctly-scoped access token for the role you select below — it is not a fabricated
-              "always succeeds" login.
+              Real password check: nexus-identity-service verifies this against a stored bcrypt hash and rejects a
+              wrong password or unknown account with a real error. There's no signup flow yet, so every account below
+              is a seeded demo user (one per role) sharing the password shown — pick a quick-fill chip or type your
+              own account's user ID and password.
             </Text>
           </View>
 
-          <Text style={[styles.label, { color: colors.text }]}>Work email</Text>
+          <Text style={[styles.label, { color: colors.text }]}>User ID</Text>
           <TextInput
             value={userId}
             onChangeText={setUserId}
-            placeholder="Work email"
+            placeholder="you@nexus.example"
             placeholderTextColor={colors.textMuted}
             style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.background }]}
             autoCapitalize="none"
             editable={!isAuthenticating}
           />
 
-          <Text style={[styles.label, { color: colors.text }]}>Tenant ID (optional — defaults to the demo sandbox)</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Password</Text>
           <TextInput
-            value={tenantId}
-            onChangeText={setTenantId}
-            placeholder="demo_sandbox"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Password"
             placeholderTextColor={colors.textMuted}
             style={[styles.input, { borderColor: colors.border, color: colors.text, backgroundColor: colors.background }]}
             autoCapitalize="none"
+            secureTextEntry
             editable={!isAuthenticating}
           />
 
-          <Text style={[styles.label, { color: colors.text }]}>Role</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Quick-fill a demo account ({DEMO_PASSWORD})</Text>
           <View style={styles.roleGrid}>
-            {SELECTABLE_ROLES.map((candidate) => {
-              const isActive = candidate === role;
+            {DEMO_ROLES.map((candidate) => {
+              const isActive = userId === demoUserId(candidate);
               return (
                 <TouchableOpacity
                   key={candidate}
-                  onPress={() => setRole(candidate)}
+                  onPress={() => {
+                    setUserId(demoUserId(candidate));
+                    setPassword(DEMO_PASSWORD);
+                  }}
                   disabled={isAuthenticating}
                   style={[
                     styles.roleChip,

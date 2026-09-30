@@ -2,24 +2,19 @@
  * Real auth service — talks to nexus-identity-service's `POST /auth/token`
  * through the gateway.
  *
- * This replaces the old `getDemoSession()` stub that returned a hardcoded
- * user with no network call at all. It is still a simplified login: the
- * backend has no password store yet (see nexus-identity-service's
- * `schemas/login.py` docstring and the project's P1 list), so there is no
- * password to check here either — `role` selects which EnterpriseRole's
- * scopes to mint. What IS real: a genuine HTTP round-trip to
- * nexus-identity-service, a genuine signed JWT with genuine scopes, and a
- * genuine failure (network error, service down, bad request) surfaced to
- * the caller — never a fabricated "always succeeds" login like the
- * previous UI had.
+ * nexus-identity-service now has a real password store (bcrypt-hashed,
+ * in-memory pending a real DB — see its app/store/user_store.py): a login
+ * is `userId` + `password`, checked against a stored hash, and the
+ * account's role/tenant come back from the server — never chosen by the
+ * client. A wrong password or unknown userId gets a real failure here
+ * (postJSON throws ApiError on the 401), never a fabricated success.
  */
 import { getJSON, postJSON } from "@/lib/apiClient";
 import type { EnterpriseRole } from "@/lib/permissions";
 
 export type LoginInput = {
   userId: string;
-  role: EnterpriseRole;
-  tenantId?: string;
+  password: string;
 };
 
 export type LoginResult = {
@@ -41,8 +36,7 @@ type LoginResponseBody = {
 export async function login(input: LoginInput): Promise<LoginResult> {
   const body = await postJSON<LoginResponseBody>("/api/v1/auth/token", {
     user_id: input.userId,
-    role: input.role,
-    tenant_id: input.tenantId,
+    password: input.password,
   });
 
   return {
