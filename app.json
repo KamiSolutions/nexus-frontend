@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "nexus-portal",
-    "slug": "nexus-portal",
+    "name": "Nexus Portal",
+    "slug": "nexus-frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
