@@ -10,7 +10,7 @@ import { DataTable, type DataTableColumn } from "@/components/tables/DataTable";
 import { ResourceScreen } from "@/components/dashboard/ResourceScreen";
 import { Surface } from "@/components/ui/Surface";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { useAsyncResource } from "@/hooks/useAsyncResource";
+import { useCachedAsyncResource } from "@/hooks/useCachedAsyncResource";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
 import { listClaims, type ClaimRecord } from "@/services/claims/claimsService";
 import React from "react";
@@ -31,7 +31,7 @@ const columns: DataTableColumn<ClaimRow>[] = [
 ];
 
 export default function ClaimsRoute() {
-  const state = useAsyncResource<ClaimRecord[]>(listClaims);
+  const state = useCachedAsyncResource<ClaimRecord[]>("claims", listClaims);
   const { colors } = useEnterpriseTheme();
 
   return (

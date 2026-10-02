@@ -13,7 +13,7 @@ import { ModuleQuickLinks } from "@/components/dashboard/ModuleQuickLinks";
 import { ResourceScreen } from "@/components/dashboard/ResourceScreen";
 import { Surface } from "@/components/ui/Surface";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { useAsyncResource } from "@/hooks/useAsyncResource";
+import { useCachedAsyncResource } from "@/hooks/useCachedAsyncResource";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
 import { listPolicies, type PolicyRecord } from "@/services/finance/financeService";
 import React from "react";
@@ -36,7 +36,7 @@ const columns: DataTableColumn<PolicyRow>[] = [
 ];
 
 export default function PoliciesRoute() {
-  const state = useAsyncResource<PolicyRecord[]>(listPolicies);
+  const state = useCachedAsyncResource<PolicyRecord[]>("policies", listPolicies);
   const { colors } = useEnterpriseTheme();
 
   return (

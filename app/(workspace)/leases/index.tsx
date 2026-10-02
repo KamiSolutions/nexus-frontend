@@ -15,7 +15,7 @@ import { DataTable, type DataTableColumn } from "@/components/tables/DataTable";
 import { ResourceScreen } from "@/components/dashboard/ResourceScreen";
 import { Surface } from "@/components/ui/Surface";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { useAsyncResource } from "@/hooks/useAsyncResource";
+import { useCachedAsyncResource } from "@/hooks/useCachedAsyncResource";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
 import { listLeases, type LeaseRecord } from "@/services/leases/leasesService";
 import React from "react";
@@ -36,7 +36,7 @@ const columns: DataTableColumn<LeaseRow>[] = [
 ];
 
 export default function LeasesRoute() {
-  const state = useAsyncResource<LeaseRecord[]>(listLeases);
+  const state = useCachedAsyncResource<LeaseRecord[]>("leases", listLeases);
   const { colors } = useEnterpriseTheme();
 
   return (

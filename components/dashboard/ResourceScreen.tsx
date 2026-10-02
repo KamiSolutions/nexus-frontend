@@ -5,6 +5,12 @@
  * one of: a spinner, an honest error box with a Retry button, or the
  * caller's content once data has actually loaded. No branch here ever
  * substitutes placeholder data for a failed call.
+ *
+ * Cache banner (2026-10-02): when `state.source === "cache"` — set only by
+ * `useCachedAsyncResource` (see that hook and `lib/resolveCachedResource.ts`)
+ * — this renders an explicit "Showing cached data" banner with the real
+ * `cachedAt` timestamp instead of a live-data badge, so cached data is
+ * never presented as if it just loaded from the gateway.
  */
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { useTenant } from "@/providers/TenantProvider";
@@ -21,9 +27,23 @@ type ResourceScreenProps<T> = {
   children: (data: T) => React.ReactNode;
 };
 
+function formatCachedAt(cachedAt: string): string {
+  const then = new Date(cachedAt);
+  if (Number.isNaN(then.getTime())) {
+    return cachedAt;
+  }
+  const minutesAgo = Math.max(0, Math.round((Date.now() - then.getTime()) / 60000));
+  if (minutesAgo < 1) return "moments ago";
+  if (minutesAgo < 60) return `${minutesAgo} min ago`;
+  const hoursAgo = Math.round(minutesAgo / 60);
+  if (hoursAgo < 24) return `${hoursAgo}h ago`;
+  return then.toLocaleString();
+}
+
 export function ResourceScreen<T>({ title, subtitle, state, loadingLabel, children }: ResourceScreenProps<T>) {
   const { colors, isDark } = useEnterpriseTheme();
   const { activeCompany } = useTenant();
+  const isCached = state.kind === "loaded" && state.source === "cache";
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.container}>
@@ -47,6 +67,18 @@ export function ResourceScreen<T>({ title, subtitle, state, loadingLabel, childr
         <View style={[styles.errorBox, { borderColor: colors.rose, backgroundColor: isDark ? colors.hover : colors.background }]}>
           <StatusBadge label="Could not load" tone="rose" />
           <Text style={[styles.errorText, { color: colors.textMuted }]}>{state.message}</Text>
+          <TouchableOpacity onPress={state.reload}>
+            <Text style={[styles.retry, { color: colors.blue }]}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {state.kind === "loaded" && isCached && (
+        <View style={[styles.cacheBanner, { borderColor: colors.amber, backgroundColor: isDark ? colors.hover : colors.background }]}>
+          <StatusBadge label="Offline — showing cached data" tone="amber" />
+          <Text style={[styles.cacheText, { color: colors.textMuted }]}>
+            Last updated {formatCachedAt((state as { cachedAt: string }).cachedAt)}. Reconnect and retry for current data.
+          </Text>
           <TouchableOpacity onPress={state.reload}>
             <Text style={[styles.retry, { color: colors.blue }]}>Retry</Text>
           </TouchableOpacity>
@@ -106,6 +138,18 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   errorText: {
+    fontSize: 13,
+    lineHeight: 19,
+    fontWeight: "600",
+  },
+  cacheBanner: {
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 14,
+    gap: 8,
+    alignItems: "flex-start",
+  },
+  cacheText: {
     fontSize: 13,
     lineHeight: 19,
     fontWeight: "600",

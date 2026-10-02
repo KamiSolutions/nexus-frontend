@@ -9,6 +9,13 @@
  * project's core rule ("never present mocked/demo data as if it came from
  * a real integration"), a failed call surfaces here as an honest `error`
  * state — it never falls back to stale or fabricated data.
+ *
+ * `source`/`cachedAt` on the `loaded` variant (2026-10-02): added so this
+ * same state type also covers `useCachedAsyncResource`'s offline-first
+ * result (see that hook) without `ResourceScreen` needing a second state
+ * type. Every screen still using this hook directly (Companies, Admin,
+ * Settings, Analytics, Reports — no offline cache yet) simply never sets
+ * `source`, so nothing changes for them.
  */
 import { useAuth } from "@/providers/AuthProvider";
 import { useCallback, useEffect, useState } from "react";
@@ -16,7 +23,7 @@ import { useCallback, useEffect, useState } from "react";
 export type AsyncResourceState<T> =
   | { kind: "loading" }
   | { kind: "error"; message: string }
-  | { kind: "loaded"; data: T };
+  | { kind: "loaded"; data: T; source?: "live" | "cache"; cachedAt?: string };
 
 /**
  * Calls `loader(token, tenantId)` once on mount (and whenever `deps`

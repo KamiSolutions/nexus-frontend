@@ -11,7 +11,7 @@ import { DataTable, type DataTableColumn } from "@/components/tables/DataTable";
 import { ResourceScreen } from "@/components/dashboard/ResourceScreen";
 import { Surface } from "@/components/ui/Surface";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { useAsyncResource } from "@/hooks/useAsyncResource";
+import { useCachedAsyncResource } from "@/hooks/useCachedAsyncResource";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
 import { listEmployees, type EmployeeRecord } from "@/services/hr/hrService";
 import React from "react";
@@ -32,7 +32,7 @@ const columns: DataTableColumn<EmployeeRow>[] = [
 ];
 
 export default function EmployeesRoute() {
-  const state = useAsyncResource<EmployeeRecord[]>(listEmployees);
+  const state = useCachedAsyncResource<EmployeeRecord[]>("employees", listEmployees);
   const { colors } = useEnterpriseTheme();
 
   return (

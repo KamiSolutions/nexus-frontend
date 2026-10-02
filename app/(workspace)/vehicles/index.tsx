@@ -12,7 +12,7 @@ import { ModuleQuickLinks } from "@/components/dashboard/ModuleQuickLinks";
 import { ResourceScreen } from "@/components/dashboard/ResourceScreen";
 import { Surface } from "@/components/ui/Surface";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { useAsyncResource } from "@/hooks/useAsyncResource";
+import { useCachedAsyncResource } from "@/hooks/useCachedAsyncResource";
 import { useEnterpriseTheme } from "@/providers/ThemeProvider";
 import { listVehicles, type VehicleRecord } from "@/services/vehicles/vehicleService";
 import React from "react";
@@ -33,7 +33,7 @@ const columns: DataTableColumn<VehicleRow>[] = [
 ];
 
 export default function VehiclesRoute() {
-  const state = useAsyncResource<VehicleRecord[]>(listVehicles);
+  const state = useCachedAsyncResource<VehicleRecord[]>("vehicles", listVehicles);
   const { colors } = useEnterpriseTheme();
 
   return (
