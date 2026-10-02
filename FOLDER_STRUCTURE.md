@@ -1,4 +1,13 @@
-# Nexus Frontend (nexus-portal product) - Recommended Folder Structure
+# Nexus Frontend - Recommended Folder Structure
+
+> **Note (2026-10-02):** the tree below is a *proposed target structure*, not a description of
+> the current repo. Some of it is already true (`app/(auth)/`, `app/(workspace)/`,
+> `app/components/RoleProtected.tsx`, real `.env.example`/`app.json`/`README.md`), and some of it
+> is aspirational and not yet implemented (`components/modules/*`, path aliases, barrel exports,
+> `state/` for Zustand). The legacy flat-route tree this doc's Phase-1 migration path once
+> implied ((tabs)/, app/financials/, app/hr/, etc.) has since been fully retired for real — see
+> `claude/nexus-portal-plan.md`'s Legacy route retirement section. Read this doc as "where we
+> could take the structure next," not "what exists today."
 
 ## Current State Analysis
 
@@ -218,15 +227,10 @@ nexus-frontend/
 │
 │
 ├── assets/
-│   ├── images/
-│   │   ├── apex_division.png
-│   │   ├── nxs_finance.png
-│   │   ├── nxs_management.png
-│   │   ├── icon.png
-│   │   ├── splash-icon.png
-│   │   ├── android-icon-foreground.png
-│   │   ├── android-icon-background.png
-│   │   └── android-icon-monochrome.png
+│   ├── images/                             # icon.png, splash-icon.png, android-icon-*.png,
+│   │                                       # plus demo/fixture imagery (vehicles, buildings,
+│   │                                       # placeholder tenant logos) — see assets/images/
+│   │                                       # on disk for the actual current set
 │   ├── fonts/
 │   └── lottie/                             # Animation files
 │
@@ -236,8 +240,7 @@ nexus-frontend/
 ├── package.json                            # Dependencies (updated)
 ├── tsconfig.json
 ├── eslint.config.js
-├── README.md                               # Project README (new)
-├── SANITISATION_REPORT.md                  # Rebranding report (new)
+├── README.md                               # Project README
 └── FOLDER_STRUCTURE.md                     # This file
 ```
 
