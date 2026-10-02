@@ -1,5 +1,17 @@
-import { ModuleOverview } from "@/components/dashboard/ModuleOverview";
+/**
+ * Finance Operations landing screen.
+ *
+ * Previously showed hardcoded "18 pending / R4.8M approved MTD" metrics
+ * and fake requisition rows. There is no backend entity for requisitions
+ * yet (nexus-financials-service's write-endpoints round only built the
+ * policies ledger — see the Policies screen for that real data), so this
+ * now states that honestly instead of inventing numbers. The sub-routes
+ * below (requisitions/pending/approved/loan) are real, ported legacy UI —
+ * still reachable via the quick-links chips — just not backed by a
+ * tenant-wide aggregate endpoint yet.
+ */
 import { ModuleQuickLinks } from "@/components/dashboard/ModuleQuickLinks";
+import { NotAvailablePanel } from "@/components/dashboard/NotAvailablePanel";
 import React from "react";
 import { View } from "react-native";
 
@@ -14,19 +26,10 @@ export default function FinanceRoute() {
           { label: "Loan applications", href: "/(workspace)/finance/loan" },
         ]}
       />
-      <ModuleOverview
+      <NotAvailablePanel
         title="Finance Operations"
         subtitle="Financial requisitions, loans, approvals, budgets, exports, audit trails, and approval pipelines."
-        metrics={[
-          { label: "Pending", value: "18", tone: "amber" },
-          { label: "Approved MTD", value: "R4.8M", tone: "emerald" },
-          { label: "Avg cycle", value: "1.8 days", tone: "blue" },
-        ]}
-        rows={[
-          { item: "Office expansion capex", company: "Group HQ", amount: "R1.2M", status: "Review" },
-          { item: "Vehicle service batch", company: "KFM", amount: "R186k", status: "Pending" },
-          { item: "Payroll loan request", company: "KFS", amount: "R42k", status: "Approved" },
-        ]}
+        reason="There's no requisitions/approvals backend entity yet — only the real policy ledger (see Policies) has been built out. The sub-workflow pages above are real, ported screens; a tenant-wide requisitions summary isn't built yet."
       />
     </View>
   );

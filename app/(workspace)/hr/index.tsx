@@ -1,5 +1,17 @@
-import { ModuleOverview } from "@/components/dashboard/ModuleOverview";
+/**
+ * HR Workspace landing screen.
+ *
+ * Previously showed hardcoded "12 leave requests / 47 contracts" metrics
+ * and fake rows. There is no backend entity for leave requests or
+ * contracts yet (nexus-hr-service's write-endpoints round only built the
+ * employee ledger — see the Employees & Access screen for that real
+ * data), so this now states that honestly instead of inventing numbers.
+ * The sub-routes below (leave/contracts) are real, ported legacy UI —
+ * still reachable via the quick-links chips — just not backed by a
+ * tenant-wide aggregate endpoint yet.
+ */
 import { ModuleQuickLinks } from "@/components/dashboard/ModuleQuickLinks";
+import { NotAvailablePanel } from "@/components/dashboard/NotAvailablePanel";
 import React from "react";
 import { View } from "react-native";
 
@@ -12,19 +24,10 @@ export default function HRRoute() {
           { label: "Contracts", href: "/(workspace)/hr/contracts" },
         ]}
       />
-      <ModuleOverview
+      <NotAvailablePanel
         title="HR Workspace"
         subtitle="Leave workflows, employee contracts, onboarding, policy acknowledgement, and workforce analytics."
-        metrics={[
-          { label: "Leave requests", value: "12", tone: "amber" },
-          { label: "Contracts", value: "47", tone: "blue" },
-          { label: "Onboarding", value: "9", tone: "emerald" },
-        ]}
-        rows={[
-          { item: "Annual leave", employee: "Naledi Dube", company: "KFS", status: "Pending" },
-          { item: "Contract renewal", employee: "Aviwe Maseko", company: "Group HQ", status: "Due soon" },
-          { item: "Policy acknowledgement", employee: "Team Ops", company: "KFM", status: "88%" },
-        ]}
+        reason="There's no leave-request or contracts backend entity yet — only the real employee ledger (see Employees & Access) has been built out. The sub-workflow pages above are real, ported screens; a tenant-wide leave/contracts summary isn't built yet."
       />
     </View>
   );
