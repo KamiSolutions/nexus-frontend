@@ -8,6 +8,12 @@
 // back-office (finance/HR/fleet/claims/admin) with zero representation of
 // the field-operations side (vehicle dispatch, case intake, mortuary
 // logistics) that the platform is actually built around.
+//
+// 2026-10-02: COMPANY_ADMIN gained leases:create + leases:manage — the
+// leases-writes round added a real per-property lease ledger
+// (nexus-claims-service), and COMPANY_ADMIN was the decided owner (no
+// single-domain "Leasing Manager" role exists yet; revisit if one is
+// ever introduced).
 export type EnterpriseRole =
   | "SUPER_ADMIN"
   | "GROUP_ADMIN"
@@ -98,6 +104,8 @@ export const rolePermissions: Record<EnterpriseRole, Permission[]> = {
     "vehicles:view",
     "vehicles:manage",
     "leases:view",
+    "leases:create",
+    "leases:manage",
     "policies:view",
     "claims:view",
     "analytics:view",

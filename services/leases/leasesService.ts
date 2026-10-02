@@ -1,15 +1,12 @@
 /**
- * Lease summary client — calls nexus-claims-service's real
- * `GET /api/v1/leases/summary` through the gateway.
+ * Leases client — calls nexus-claims-service's real
+ * `GET /api/v1/leases/summary` and, as of 2026-10-02, the real
+ * `GET /api/v1/leases/leases` ledger through the gateway.
  *
- * New file: the Lease Portfolio screen (app/(workspace)/leases/index.tsx)
- * previously hardcoded fake per-property rows (Premier Plaza, etc.) with
- * no service client at all. Leases got no write endpoints in the
- * write-endpoints round (no domain role holds `leases:create` in the RBAC
- * model), so there is no per-lease list to fetch yet — only this
- * tenant-wide aggregate summary. The screen shows these real counts and
- * says plainly that per-property records aren't available yet, rather
- * than inventing rows to fill a table.
+ * Leases gained real write endpoints (POST/PUT/DELETE) once COMPANY_ADMIN
+ * was given `leases:create`/`leases:manage` in the combined RBAC model —
+ * see app/services/claims/lease_service.py on the backend. `listLeases`
+ * mirrors `claimsService.ts`'s `listClaims()` pattern exactly.
  */
 import { getJSON } from "@/lib/apiClient";
 
@@ -36,4 +33,43 @@ export async function getLeaseSummary(token: string, tenantId: string): Promise<
     activeLeases: body.active_leases,
     leasesRequiringInspection: body.leases_requiring_inspection,
   };
+}
+
+export type LeaseStatus = "active" | "pending_inspection" | "expired" | "terminated";
+
+export type LeaseRecord = {
+  id: string;
+  tenantId: string;
+  propertyName: string;
+  lesseeName: string;
+  monthlyRent: number;
+  status: LeaseStatus;
+  createdAt: string;
+  updatedAt: string;
+};
+
+type LeaseRecordBody = {
+  id: string;
+  tenant_id: string;
+  property_name: string;
+  lessee_name: string;
+  monthly_rent: number;
+  status: LeaseStatus;
+  created_at: string;
+  updated_at: string;
+};
+
+export async function listLeases(token: string, tenantId: string): Promise<LeaseRecord[]> {
+  const body = await getJSON<LeaseRecordBody[]>("/api/v1/leases/leases", { token, tenantId });
+
+  return body.map((lease) => ({
+    id: lease.id,
+    tenantId: lease.tenant_id,
+    propertyName: lease.property_name,
+    lesseeName: lease.lessee_name,
+    monthlyRent: lease.monthly_rent,
+    status: lease.status,
+    createdAt: lease.created_at,
+    updatedAt: lease.updated_at,
+  }));
 }
