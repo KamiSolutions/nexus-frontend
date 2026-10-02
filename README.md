@@ -46,8 +46,8 @@ If you're cloning this project, follow these steps to get it running locally.
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/your-org/nexus-portal.git
-cd nexus-portal
+git clone https://github.com/KamiSolutions/nexus-frontend.git
+cd nexus-frontend
 2. Install dependencies
 npm install
 
@@ -95,7 +95,7 @@ JWT token-based auth is enabled
 CORS is configured for your frontend domain
 
 📁 Project Structure (Simplified)
-nexus-portal/
+nexus-frontend/
 ├── app/                # Routes (Expo Router)
 ├── components/        # Reusable UI components
 ├── lib/               # API + utilities

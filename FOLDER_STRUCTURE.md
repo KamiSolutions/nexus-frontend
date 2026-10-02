@@ -1,4 +1,4 @@
-# Nexus Portal - Recommended Folder Structure
+# Nexus Frontend (nexus-portal product) - Recommended Folder Structure
 
 ## Current State Analysis
 
@@ -9,7 +9,7 @@ The current folder structure mixes concerns and has files spread across top-leve
 ## Recommended Folder Structure
 
 ```
-nexus-portal/
+nexus-frontend/
 │
 ├── app/                                    # Expo Router app directory (main navigation)
 │   ├── (auth)/                             # Auth stack
